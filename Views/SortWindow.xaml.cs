@@ -129,7 +129,7 @@ namespace SortVisualizer.Views {
           for (int col = 1; col <= cols; col += 1) {
             if (counter > total) break;
 
-            double value = Math.Round(random.NextDouble() * range, 2);
+            double value = Math.Round(random.NextDouble() * range);
             dict["К" + col] = value;
             counter += 1;
           }
@@ -190,7 +190,7 @@ namespace SortVisualizer.Views {
         double[] data = new double[arraySize];
 
         for (int elementIndex = 0; elementIndex < arraySize; elementIndex += 1) {
-          data[elementIndex] = Math.Round(minValue + random.NextDouble() * range, 2);
+          data[elementIndex] = Math.Round(minValue + random.NextDouble() * range);
         }
 
         currentArray = data;
@@ -796,7 +796,6 @@ namespace SortVisualizer.Views {
       return result.ToArray();
     }
 
-    // ⚡ Для ПОЛЯ ВВОДА — выводит ВЕСЬ массив (виден через скролл)
     private string FormatArrayPreview(double[] array) {
       if (array == null || array.Length == 0) return "m = []";
 
@@ -805,7 +804,7 @@ namespace SortVisualizer.Views {
 
       string[] parts = new string[visibleCount];
       for (int elementIndex = 0; elementIndex < visibleCount; elementIndex += 1) {
-        parts[elementIndex] = array[elementIndex].ToString("F2", ruCulture);
+        parts[elementIndex] = Math.Round(array[elementIndex]).ToString("F0", ruCulture);
       }
 
       string suffix = array.Length > 50
@@ -815,7 +814,6 @@ namespace SortVisualizer.Views {
       return "m = [" + string.Join(", ", parts) + suffix;
     }
 
-    // ⚡ Для ИСХОДНОГО МАССИВА
     private string FormatArrayFull(double[] array) {
       if (array == null || array.Length == 0) return "m = []";
 
@@ -823,14 +821,10 @@ namespace SortVisualizer.Views {
 
       string[] parts = new string[array.Length];
       for (int elementIndex = 0; elementIndex < array.Length; elementIndex += 1) {
-        parts[elementIndex] = array[elementIndex].ToString("F2", ruCulture);
+        parts[elementIndex] = Math.Round(array[elementIndex]).ToString("F0", ruCulture);
       }
 
       return "m = [" + string.Join(", ", parts) + "]  (всего " + array.Length + ")";
-    }
-
-    private void ResultsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-
     }
   }
 }

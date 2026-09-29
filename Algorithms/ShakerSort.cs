@@ -76,10 +76,13 @@ namespace SortVisualizer.Algorithms {
 
         leftBound += 1;
 
-        iterations += 1;
+        // ⚡ Считаем итерацию, если были перестановки ИЛИ это первый проход
+        if (swapped || iterations == 0) {
+          iterations += 1;
 
-        if (onStep != null)
-          onStep((double[])array.Clone(), -1, -1, iterations);
+          if (onStep != null)
+            onStep((double[])array.Clone(), -1, -1, iterations);
+        }
       }
 
       return array;

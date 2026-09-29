@@ -37,25 +37,20 @@ namespace SortVisualizer.Models {
         if (SortedArray == null || SortedArray.Length == 0)
           return "[]";
 
-        int visibleCount = Math.Min(SortedArray.Length, 50);
         CultureInfo ruCulture = CultureInfo.GetCultureInfo("ru-RU");
 
-        string[] parts = new string[visibleCount];
-        for (int elementIndex = 0; elementIndex < visibleCount; elementIndex += 1) {
-          parts[elementIndex] = SortedArray[elementIndex].ToString("F2", ruCulture);
+        string[] parts = new string[SortedArray.Length];
+        for (int elementIndex = 0; elementIndex < SortedArray.Length; elementIndex += 1) {
+          parts[elementIndex] = Math.Round(SortedArray[elementIndex]).ToString("F0", ruCulture);
         }
 
-        string suffix = SortedArray.Length > 50
-            ? ", ... (всего " + SortedArray.Length + ")"
-            : "";
-
-        return "[" + string.Join(", ", parts) + suffix + "]";
+        return "[" + string.Join(", ", parts) + "]";
       }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null) {
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
       PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
   }

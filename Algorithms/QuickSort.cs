@@ -5,7 +5,7 @@ using SortVisualizer.Models;
 
 namespace SortVisualizer.Algorithms {
   public class QuickSort : ISorter {
-    public string Name => "Быстрая (Хоара)";
+    public string Name => "Быстрая (Хоара) ⚡";
 
     private double iterations;
     private bool isAscending;
@@ -34,8 +34,6 @@ namespace SortVisualizer.Algorithms {
 
     private async Task QuickSortRecursive(double[] array, int lowIndex, int highIndex) {
       if (lowIndex < highIndex) {
-        iterations += 1;
-
         int pivotIndex = await Partition(array, lowIndex, highIndex);
         await QuickSortRecursive(array, lowIndex, pivotIndex - 1);
         await QuickSortRecursive(array, pivotIndex + 1, highIndex);
@@ -49,6 +47,11 @@ namespace SortVisualizer.Algorithms {
       for (int currentIndex = lowIndex; currentIndex < highIndex; currentIndex += 1) {
         ct.ThrowIfCancellationRequested();
 
+        iterations += 1;
+
+        if (onStep != null)
+          onStep((double[])array.Clone(), currentIndex, highIndex, iterations);
+
         bool needMove = isAscending
             ? array[currentIndex] <= pivotValue
             : array[currentIndex] >= pivotValue;
@@ -60,9 +63,6 @@ namespace SortVisualizer.Algorithms {
           array[smallerIndex] = array[currentIndex];
           array[currentIndex] = temporary;
 
-          if (onStep != null)
-            onStep((double[])array.Clone(), smallerIndex, currentIndex, iterations);
-
           if (delayMs > 0)
             await Task.Delay(delayMs, ct);
         }
@@ -73,9 +73,6 @@ namespace SortVisualizer.Algorithms {
       double pivotTemporary = array[smallerIndex];
       array[smallerIndex] = array[highIndex];
       array[highIndex] = pivotTemporary;
-
-      if (onStep != null)
-        onStep((double[])array.Clone(), smallerIndex, highIndex, iterations);
 
       if (delayMs > 0)
         await Task.Delay(delayMs, ct);

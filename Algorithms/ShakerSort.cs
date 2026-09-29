@@ -24,9 +24,9 @@ namespace SortVisualizer.Algorithms {
       while (swapped) {
         swapped = false;
 
+        // Проход слева направо
         for (int currentIndex = leftBound; currentIndex < rightBound; currentIndex += 1) {
           ct.ThrowIfCancellationRequested();
-          iterations += 1;
 
           double leftValue = array[currentIndex];
           double rightValue = array[currentIndex + 1];
@@ -49,13 +49,10 @@ namespace SortVisualizer.Algorithms {
         }
 
         rightBound -= 1;
-        if (!swapped) break;
 
-        swapped = false;
-
+        // Проход справа налево
         for (int currentIndex = rightBound; currentIndex > leftBound; currentIndex -= 1) {
           ct.ThrowIfCancellationRequested();
-          iterations += 1;
 
           double leftValue = array[currentIndex - 1];
           double rightValue = array[currentIndex];
@@ -78,6 +75,11 @@ namespace SortVisualizer.Algorithms {
         }
 
         leftBound += 1;
+
+        iterations += 1;
+
+        if (onStep != null)
+          onStep((double[])array.Clone(), -1, -1, iterations);
       }
 
       return array;

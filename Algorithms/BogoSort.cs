@@ -5,7 +5,9 @@ using SortVisualizer.Models;
 
 namespace SortVisualizer.Algorithms {
   public class BogoSort : ISorter {
-    public string Name => "Болотная (Bogosort)";
+    public string Name => "Болотная (Bogosort) 🐌";
+
+    public double MaxIterations { get; set; } = 100000;
 
     public async Task<double[]> SortAsync(
         double[] input,
@@ -14,15 +16,15 @@ namespace SortVisualizer.Algorithms {
         int delayMs,
         CancellationToken ct) {
       double[] array = (double[])input.Clone();
-      double iterations = 1;
+      double iterations = 0;
       bool isAscending = direction == SortDirection.Ascending;
 
       Random random = new Random();
 
       while (!IsSorted(array, isAscending)) {
         ct.ThrowIfCancellationRequested();
-        iterations += 1;
 
+        // Перемешивание Фишера-Йетса
         for (int currentIndex = array.Length - 1; currentIndex > 0; currentIndex -= 1) {
           int randomIndex = random.Next(currentIndex + 1);
 
@@ -31,14 +33,17 @@ namespace SortVisualizer.Algorithms {
           array[randomIndex] = temporary;
         }
 
+        iterations += 1;
+
         if (onStep != null)
           onStep((double[])array.Clone(), -1, -1, iterations);
 
         if (delayMs > 0)
           await Task.Delay(delayMs, ct);
 
-        if (iterations > 100000) {
-          throw new OperationCanceledException("BogoSort слишком долго — прерываем");
+        if (iterations > MaxIterations) {
+          throw new OperationCanceledException(
+              "BogoSort превысил лимит итераций (" + MaxIterations + ")");
         }
       }
 

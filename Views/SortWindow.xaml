@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SortVisualizer"
         mc:Ignorable="d"
-        Title="Визуализатор сортировок" Height="900" Width="1400"
+        Title="Визуализатор сортировок" Height="1000" Width="1650"
         Background="#FFF8FA"
         FontFamily="Segoe UI" FontSize="13">
 
@@ -13,10 +13,8 @@
     <!-- МЕНЮ СВЕРХУ -->
     <Menu DockPanel.Dock="Top" Background="#FFE0EC">
       <MenuItem Header="Файл" Foreground="#3D1F2C">
-        <MenuItem Header="Загрузить из Excel…"
-                          Click="OnLoadExcelClick"/>
-        <MenuItem Header="Загрузить из Google Table…"
-                          Click="OnLoadGoogleClick"/>
+        <MenuItem Header="Загрузить из Excel…" Click="OnLoadExcelClick"/>
+        <MenuItem Header="Загрузить из Google Table…" Click="OnLoadGoogleClick"/>
         <Separator/>
         <MenuItem Header="Выход" Click="OnExitClick"/>
       </MenuItem>
@@ -25,29 +23,26 @@
     <!-- ОСНОВНАЯ ОБЛАСТЬ -->
     <Grid>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="260"/>
+        <ColumnDefinition Width="280"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
 
       <!-- ЛЕВАЯ КОЛОНКА -->
       <Border Grid.Column="0" Background="#FFE0EC"
-                    BorderBrush="#FFD1E0" BorderThickness="0,0,1,0">
+              BorderBrush="#FFD1E0" BorderThickness="0,0,1,0">
         <DockPanel>
-          <TextBlock DockPanel.Dock="Top"
-                               Text="Сортировки"
-                               FontSize="20" FontWeight="SemiBold"
-                               Foreground="#3D1F2C"
-                               Margin="20,20,20,10"/>
+          <TextBlock DockPanel.Dock="Top" Text="Сортировки"
+                     FontSize="20" FontWeight="SemiBold"
+                     Foreground="#3D1F2C" Margin="20,20,20,10"/>
 
           <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
             <ItemsControl x:Name="AlgorithmList">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
                   <Border Margin="0,4" Padding="12"
-                                            CornerRadius="8"
-                                            BorderThickness="2"
-                                            Cursor="Hand"
-                                            MouseLeftButtonUp="OnAlgorithmCardClick">
+                          CornerRadius="8" BorderThickness="2"
+                          Cursor="Hand"
+                          MouseLeftButtonUp="OnAlgorithmCardClick">
                     <Border.Style>
                       <Style TargetType="Border">
                         <Setter Property="Background" Value="#FFF8FA"/>
@@ -63,8 +58,7 @@
                     <StackPanel>
                       <StackPanel Orientation="Horizontal">
                         <Ellipse Width="12" Height="12"
-                                                         VerticalAlignment="Center"
-                                                         Margin="0,0,8,0">
+                                 VerticalAlignment="Center" Margin="0,0,8,0">
                           <Ellipse.Style>
                             <Style TargetType="Ellipse">
                               <Setter Property="Fill" Value="#BDBDBD"/>
@@ -77,16 +71,13 @@
                           </Ellipse.Style>
                         </Ellipse>
                         <TextBlock Text="{Binding Name}"
-                                                           FontWeight="SemiBold"
-                                                           FontSize="14"
-                                                           Foreground="#3D1F2C"
-                                                           VerticalAlignment="Center"/>
+                                   FontWeight="SemiBold" FontSize="14"
+                                   Foreground="#3D1F2C"
+                                   VerticalAlignment="Center"/>
                       </StackPanel>
                       <TextBlock Text="{Binding Description}"
-                                                       TextWrapping="Wrap"
-                                                       FontSize="11"
-                                                       Foreground="#7A5C68"
-                                                       Margin="20,6,0,0"/>
+                                 TextWrapping="Wrap" FontSize="11"
+                                 Foreground="#7A5C68" Margin="20,6,0,0"/>
                     </StackPanel>
                   </Border>
                 </DataTemplate>
@@ -101,99 +92,161 @@
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="Auto"/>
-          <RowDefinition Height="2*"/>
-          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="1.2*"/>
           <RowDefinition Height="1*"/>
           <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Поле массива -->
         <Border Grid.Row="0"
-                        Background="#FFFFFF" CornerRadius="8"
-                        BorderBrush="#F8BBD0" BorderThickness="1"
-                        Padding="10" Margin="0,0,0,10">
-          <TextBox x:Name="TxtArray"
-                             Text="m = []"
-                             FontFamily="Consolas" FontSize="14"
-                             TextWrapping="Wrap"
-                             AcceptsReturn="True"
-                             MinHeight="70" MaxHeight="120"
-                             VerticalScrollBarVisibility="Auto"
-                             BorderThickness="0"
-                             Background="Transparent"
-                             Foreground="#3D1F2C"/>
+                Background="#FFFFFF" CornerRadius="8"
+                BorderBrush="#F8BBD0" BorderThickness="1"
+                Padding="10" Margin="0,0,0,10">
+          <ScrollViewer MaxHeight="200"
+                        VerticalScrollBarVisibility="Auto">
+            <TextBox x:Name="TxtArray"
+                     Text="m = []"
+                     FontFamily="Consolas" FontSize="12"
+                     TextWrapping="Wrap"
+                     BorderThickness="0" Background="Transparent"
+                     Foreground="#3D1F2C"/>
+          </ScrollViewer>
         </Border>
 
         <!-- Направление + генерация + кнопки -->
-        <Grid Grid.Row="1" Margin="0,0,0,10">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
 
-          <StackPanel Grid.Column="0" Orientation="Horizontal">
-            <RadioButton x:Name="RbAsc" Content="↑ По возрастанию"
-                                     GroupName="Direction"
-                                     IsChecked="True" Margin="0,0,10,0"
-                                     Foreground="#3D1F2C"/>
-            <RadioButton x:Name="RbDesc" Content="↓ По убыванию"
-                                     GroupName="Direction"
-                                     Margin="0,0,20,0"
-                                     Foreground="#3D1F2C"/>
+          <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <Rectangle Width="1" Fill="#F8BBD0" Margin="0,4,20,4"/>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+              <RadioButton x:Name="RbAsc" Content="↑ По возрастанию"
+                           GroupName="Direction" IsChecked="True"
+                           Margin="0,0,10,0" Foreground="#3D1F2C"/>
+              <RadioButton x:Name="RbDesc" Content="↓ По убыванию"
+                           GroupName="Direction" Margin="0,0,20,0"
+                           Foreground="#3D1F2C"/>
 
-            <RadioButton x:Name="RbAverage" Content="Среднее"
-                                     GroupName="Generation"
-                                     IsChecked="True" Margin="0,0,10,0"
-                                     Foreground="#3D1F2C"/>
-            <RadioButton x:Name="RbTable" Content="Табличная"
-                                     GroupName="Generation"
-                                     Margin="0,0,10,0"
-                                     Foreground="#3D1F2C"/>
-            <RadioButton x:Name="RbManual" Content="Ручной"
-                                     GroupName="Generation"
-                                     Foreground="#3D1F2C"/>
+              <Rectangle Width="1" Fill="#F8BBD0" Margin="0,4,20,4"/>
+
+              <RadioButton x:Name="RbAverage" Content="Среднее"
+                           GroupName="Generation" IsChecked="True"
+                           Margin="0,0,10,0" Foreground="#3D1F2C"
+                           Checked="OnGenerationModeChanged"/>
+              <RadioButton x:Name="RbTable" Content="Табличная"
+                           GroupName="Generation" Margin="0,0,10,0"
+                           Foreground="#3D1F2C"
+                           Checked="OnGenerationModeChanged"/>
+              <RadioButton x:Name="RbManual" Content="Ручной"
+                           GroupName="Generation" Foreground="#3D1F2C"
+                           Checked="OnGenerationModeChanged"/>
+            </StackPanel>
+
+            <Button Grid.Column="2" x:Name="BtnGenerate"
+                    Content="🎲 Сгенерировать"
+                    Padding="16,8" Margin="0,0,8,0"
+                    Background="#FCE4EC" Foreground="#C2185B"
+                    BorderBrush="#F8BBD0" BorderThickness="1"
+                    Cursor="Hand" Click="OnGenerateClick"/>
+
+            <Button Grid.Column="3" x:Name="BtnSort"
+                    Content="СОРТИРОВАТЬ"
+                    Padding="20,8"
+                    Background="#E91E63" Foreground="White"
+                    BorderBrush="#E91E63" BorderThickness="1"
+                    FontWeight="SemiBold" Cursor="Hand"
+                    Click="OnSortClick"/>
+          </Grid>
+
+          <!-- Параметры генерации -->
+          <StackPanel x:Name="GenerationParamsPanel"
+                      Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Длина массива:" VerticalAlignment="Center"
+                       Foreground="#3D1F2C" Margin="0,0,6,0"/>
+            <TextBox x:Name="TxtArraySize" Width="60" Text="100"
+                     VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+            <TextBlock Text="Диапазон:" VerticalAlignment="Center"
+                       Foreground="#3D1F2C" Margin="0,0,6,0"/>
+            <TextBox x:Name="TxtMinValue" Width="60" Text="0"
+                     VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <TextBlock Text="—" VerticalAlignment="Center"
+                       Foreground="#3D1F2C" Margin="0,0,6,0"/>
+            <TextBox x:Name="TxtMaxValue" Width="60" Text="100"
+                     VerticalAlignment="Center" Margin="0,0,20,0"/>
+
+            <TextBlock Text="Лимит итераций Bogo:"
+                       VerticalAlignment="Center"
+                       Foreground="#3D1F2C" Margin="0,0,6,0"/>
+            <TextBox x:Name="TxtBogoLimit" Width="100" Text="100000"
+                     VerticalAlignment="Center"/>
           </StackPanel>
 
-          <Button Grid.Column="2"
-                            x:Name="BtnGenerate"
-                            Content="🎲 Сгенерировать"
-                            Padding="16,8" Margin="0,0,8,0"
-                            Background="#FCE4EC" Foreground="#C2185B"
-                            BorderBrush="#F8BBD0" BorderThickness="1"
-                            Cursor="Hand"
-                            Click="OnGenerateClick"/>
+          <!-- Табличный ввод -->
+          <Border x:Name="TableInputPanel"
+                  Background="#FFFFFF" CornerRadius="8"
+                  BorderBrush="#F8BBD0" BorderThickness="1"
+                  Padding="10" Visibility="Collapsed">
+            <StackPanel>
+              <TextBlock Text="Табличный ввод (как в Excel):"
+                         FontWeight="SemiBold" Foreground="#3D1F2C"
+                         Margin="0,0,0,6"/>
 
-          <Button Grid.Column="3"
-                            x:Name="BtnSort"
-                            Content="СОРТИРОВАТЬ"
-                            Padding="20,8"
-                            Background="#E91E63" Foreground="White"
-                            BorderBrush="#E91E63" BorderThickness="1"
-                            FontWeight="SemiBold"
-                            Cursor="Hand"
-                            Click="OnSortClick"/>
-        </Grid>
+              <DataGrid x:Name="TableGrid"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="True"
+                        CanUserDeleteRows="True"
+                        Background="White"
+                        RowBackground="White"
+                        AlternatingRowBackground="#FFF8FA"
+                        BorderBrush="#F8BBD0" BorderThickness="1"
+                        MinHeight="80" MaxHeight="140"
+                        FontSize="12"
+                        RowHeight="22"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Auto"/>
 
-        <!-- Таблица результатов -->
+              <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <Button Content="📂 Импорт CSV"
+                        Click="OnImportCsvClick"
+                        Padding="12,6" Margin="0,0,8,0"
+                        Background="#FCE4EC" Foreground="#C2185B"
+                        BorderBrush="#F8BBD0" BorderThickness="1"
+                        Cursor="Hand"/>
+                <Button Content="📂 Импорт XLSX"
+                        Click="OnImportXlsxClick"
+                        Padding="12,6"
+                        Background="#FCE4EC" Foreground="#C2185B"
+                        BorderBrush="#F8BBD0" BorderThickness="1"
+                        Cursor="Hand"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+        </StackPanel>
+
+        <!-- ТАБЛИЦА РЕЗУЛЬТАТОВ -->
         <Border Grid.Row="2"
-                        Background="#FFFFFF" CornerRadius="8"
-                        BorderBrush="#F8BBD0" BorderThickness="1">
+                Background="#FFFFFF" CornerRadius="8"
+                BorderBrush="#F8BBD0" BorderThickness="1">
           <DataGrid x:Name="ResultsGrid"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              IsReadOnly="True"
-                              IsHitTestVisible="False"
-                              HeadersVisibility="Column"
-                              GridLinesVisibility="Horizontal"
-                              Background="White"
-                              RowBackground="White"
-                              AlternatingRowBackground="#FFF8FA"
-                              BorderThickness="0"
-                              HorizontalGridLinesBrush="#F5E0E8">
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False" IsReadOnly="True"
+                    IsHitTestVisible="False"
+                    HeadersVisibility="Column"
+                    GridLinesVisibility="Horizontal"
+                    Background="White" RowBackground="White"
+                    AlternatingRowBackground="#FFF8FA"
+                    BorderThickness="0"
+                    FontSize="12"
+                    RowHeight="22"
+                    VerticalScrollBarVisibility="Auto"
+                    HorizontalGridLinesBrush="#F5E0E8">
             <DataGrid.RowStyle>
               <Style TargetType="DataGridRow">
                 <Style.Triggers>
@@ -206,96 +259,58 @@
             </DataGrid.RowStyle>
             <DataGrid.Columns>
               <DataGridTextColumn Header="Алгоритм"
-                                                Binding="{Binding AlgorithmName}"
-                                                Width="180"/>
+                                  Binding="{Binding AlgorithmName}"
+                                  Width="200"/>
               <DataGridTemplateColumn Header="Отсортированный список" Width="*">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
                     <TextBlock Text="{Binding SortedArrayText}"
-                                                   TextWrapping="Wrap"
-                                                   FontFamily="Consolas"
-                                                   FontSize="12"
-                                                   VerticalAlignment="Top"
-                                                   Margin="4,4"/>
+                               TextWrapping="Wrap"
+                               FontFamily="Consolas" FontSize="11"
+                               VerticalAlignment="Top" Margin="4,2"/>
                   </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
               </DataGridTemplateColumn>
               <DataGridTextColumn Header="Время (мс)"
-                                                Binding="{Binding TimeMs, StringFormat=F2}"
-                                                Width="100"/>
+                                  Binding="{Binding TimeMs, StringFormat=F2}"
+                                  Width="100"/>
               <DataGridTextColumn Header="Итерации"
-                                                Binding="{Binding Iterations, StringFormat=F2}"
-                                                Width="100"/>
+                                  Binding="{Binding Iterations, StringFormat=F2}"
+                                  Width="100"/>
             </DataGrid.Columns>
           </DataGrid>
         </Border>
 
-        <!-- Заголовок пиковых -->
-        <TextBlock Grid.Row="3"
-                           Text="Пиковые значения"
-                           FontSize="14" FontWeight="SemiBold"
-                           Foreground="#3D1F2C"
-                           Margin="0,12,0,6"/>
-
-        <!-- Таблица пиковых -->
-        <Border Grid.Row="4"
-                        Background="#FFFFFF" CornerRadius="8"
-                        BorderBrush="#F8BBD0" BorderThickness="1">
-          <DataGrid x:Name="PeaksGrid"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              IsReadOnly="True"
-                              IsHitTestVisible="False"
-                              HeadersVisibility="Column"
-                              GridLinesVisibility="Horizontal"
-                              Background="White"
-                              RowBackground="White"
-                              AlternatingRowBackground="#FFF8FA"
-                              BorderThickness="0"
-                              HorizontalGridLinesBrush="#F5E0E8">
-            <DataGrid.RowStyle>
-              <Style TargetType="DataGridRow">
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding IsFastest}" Value="True">
-                    <Setter Property="Background" Value="#C8E6C9"/>
-                    <Setter Property="FontWeight" Value="SemiBold"/>
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="Алгоритм"
-                                                Binding="{Binding AlgorithmName}"
-                                                Width="180"/>
-              <DataGridTextColumn Header="Направление"
-                                                Binding="{Binding Direction}"
-                                                Width="120"/>
-              <DataGridTextColumn Header="Время (мс)"
-                                                Binding="{Binding TimeMs, StringFormat=F2}"
-                                                Width="100"/>
-              <DataGridTextColumn Header="Итерации"
-                                                Binding="{Binding Iterations, StringFormat=F2}"
-                                                Width="100"/>
-              <DataGridTextColumn Header="Итераций/мс (пик)"
-                                                Binding="{Binding IterationsPerMs, StringFormat=F2}"
-                                                Width="*"/>
-            </DataGrid.Columns>
-          </DataGrid>
+        <!-- ИСХОДНЫЙ МАССИВ -->
+        <Border Grid.Row="3"
+                Background="#FFFFFF" CornerRadius="8"
+                BorderBrush="#F8BBD0" BorderThickness="1"
+                Padding="10" Margin="0,10,0,0">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Top"
+                       Text="Исходный массив:"
+                       FontSize="13" FontWeight="SemiBold"
+                       Foreground="#3D1F2C" Margin="0,0,0,6"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+              <TextBlock x:Name="UnsortedText"
+                         FontFamily="Consolas" FontSize="11"
+                         Foreground="#3D1F2C"
+                         TextWrapping="Wrap"
+                         Text="m = []"/>
+            </ScrollViewer>
+          </DockPanel>
         </Border>
 
         <!-- Кнопка отмены -->
-        <StackPanel Grid.Row="5"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Margin="0,10,0,0">
+        <StackPanel Grid.Row="4" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,10,0,0">
           <Button x:Name="BtnCancel"
-                            Content="ОТМЕНИТЬ ВСЕ СОРТИРОВКИ"
-                            Padding="20,8"
-                            Background="#D81B60" Foreground="White"
-                            BorderBrush="#D81B60" BorderThickness="1"
-                            FontWeight="SemiBold"
-                            Cursor="Hand"
-                            Click="OnCancelClick"/>
+                  Content="ОТМЕНИТЬ ВСЕ СОРТИРОВКИ"
+                  Padding="20,8"
+                  Background="#D81B60" Foreground="White"
+                  BorderBrush="#D81B60" BorderThickness="1"
+                  FontWeight="SemiBold" Cursor="Hand"
+                  Click="OnCancelClick"/>
         </StackPanel>
       </Grid>
     </Grid>

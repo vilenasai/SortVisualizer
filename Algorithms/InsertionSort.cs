@@ -20,12 +20,16 @@ namespace SortVisualizer.Algorithms {
       for (int currentIndex = 1; currentIndex < array.Length; currentIndex += 1) {
         ct.ThrowIfCancellationRequested();
 
+        iterations += 1;
+
+        if (onStep != null)
+          onStep((double[])array.Clone(), -1, -1, iterations);
+
         double keyValue = array[currentIndex];
         int scanIndex = currentIndex - 1;
 
         while (scanIndex >= 0) {
           ct.ThrowIfCancellationRequested();
-          iterations += 1;
 
           double compareValue = array[scanIndex];
 
@@ -33,8 +37,7 @@ namespace SortVisualizer.Algorithms {
               ? compareValue > keyValue
               : compareValue < keyValue;
 
-          if (!needShift)
-            break;
+          if (!needShift) break;
 
           array[scanIndex + 1] = compareValue;
           scanIndex -= 1;

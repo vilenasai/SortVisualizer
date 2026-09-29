@@ -9,7 +9,7 @@ namespace SortVisualizer.Algorithms {
 
     private double iterations;
     private bool isAscending;
-    private Action<double[], int, int, double>? onStep;
+    private Action<double[], int, int, double> onStep = null!;
     private int delayMs;
     private CancellationToken ct;
 
@@ -34,6 +34,8 @@ namespace SortVisualizer.Algorithms {
 
     private async Task QuickSortRecursive(double[] array, int lowIndex, int highIndex) {
       if (lowIndex < highIndex) {
+        iterations += 1;
+
         int pivotIndex = await Partition(array, lowIndex, highIndex);
         await QuickSortRecursive(array, lowIndex, pivotIndex - 1);
         await QuickSortRecursive(array, pivotIndex + 1, highIndex);
@@ -46,7 +48,6 @@ namespace SortVisualizer.Algorithms {
 
       for (int currentIndex = lowIndex; currentIndex < highIndex; currentIndex += 1) {
         ct.ThrowIfCancellationRequested();
-        iterations += 1;
 
         bool needMove = isAscending
             ? array[currentIndex] <= pivotValue

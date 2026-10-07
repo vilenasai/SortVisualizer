@@ -4,10 +4,17 @@ using System.Threading.Tasks;
 using SortVisualizer.Models;
 
 namespace SortVisualizer.Algorithms {
+
+  public class BogoSortLimitExceededException : Exception {
+    public BogoSortLimitExceededException(string message) : base(message) { }
+  }
+
   public class BogoSort : ISorter {
     public string Name => "Болотная (Bogosort) 🐌";
 
     public double MaxIterations { get; set; } = 100000;
+
+    private static readonly Random random = new Random();
 
     public async Task<double[]> SortAsync(
         double[] input,
@@ -15,11 +22,10 @@ namespace SortVisualizer.Algorithms {
         Action<double[], int, int, double> onStep,
         int delayMs,
         CancellationToken ct) {
-      double[] array = (double[])input.Clone();
-      double iterations = 0;
-      bool isAscending = direction == SortDirection.Ascending;
 
-      Random random = new Random();
+      double[] array = (double[])input.Clone();
+      double passes = 0;                        // ← считаем перемешивания = проходы
+      bool isAscending = direction == SortDirection.Ascending;
 
       while (!IsSorted(array, isAscending)) {
         ct.ThrowIfCancellationRequested();
@@ -33,18 +39,18 @@ namespace SortVisualizer.Algorithms {
           array[randomIndex] = temporary;
         }
 
-        iterations += 1;
+        passes += 1;                            // ← один проход = одно перемешивание
 
         if (onStep != null)
-          onStep((double[])array.Clone(), -1, -1, iterations);
+          onStep((double[])array.Clone(), -1, -1, passes);
 
         if (delayMs > 0)
           await Task.Delay(delayMs, ct);
 
-        if (iterations > MaxIterations) {
-          throw new OperationCanceledException(
-              "BogoSort превысил лимит итераций (" + MaxIterations + ")");
-        }
+        if (passes > MaxIterations)
+          throw new BogoSortLimitExceededException(
+              $"BogoSort превысил лимит проходов ({MaxIterations}). " +
+              $"Массив слишком большой для этого алгоритма.");
       }
 
       return array;

@@ -13,20 +13,21 @@ namespace SortVisualizer.Algorithms {
         Action<double[], int, int, double> onStep,
         int delayMs,
         CancellationToken ct) {
+
       double[] array = (double[])input.Clone();
-      double iterations = 0;
+      double passes = 0;                        // ← считаем проходы
       bool isAscending = direction == SortDirection.Ascending;
 
       for (int currentIndex = 1; currentIndex < array.Length; currentIndex += 1) {
         ct.ThrowIfCancellationRequested();
+
+        passes += 1;                            // ← одна вставка
 
         double keyValue = array[currentIndex];
         int scanIndex = currentIndex - 1;
 
         while (scanIndex >= 0) {
           ct.ThrowIfCancellationRequested();
-
-          iterations += 1;
 
           double compareValue = array[scanIndex];
 
@@ -35,7 +36,7 @@ namespace SortVisualizer.Algorithms {
               : compareValue < keyValue;
 
           if (onStep != null)
-            onStep((double[])array.Clone(), scanIndex, currentIndex, iterations);
+            onStep((double[])array.Clone(), scanIndex, currentIndex, passes);
 
           if (!needShift) break;
 

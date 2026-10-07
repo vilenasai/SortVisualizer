@@ -9,10 +9,10 @@ namespace SortVisualizer {
     }
 
     private void OnTileClick(object sender, RoutedEventArgs e) {
-      Button button = sender as Button;
+      Button? button = sender as Button;
       if (button == null) return;
 
-      string tag = button.Tag as string;
+      string? tag = button.Tag as string;
       if (string.IsNullOrEmpty(tag)) {
         MessageBox.Show("Эта работа ещё не сделана", "В разработке",
             MessageBoxButton.OK, MessageBoxImage.Information);
@@ -24,6 +24,12 @@ namespace SortVisualizer {
           SortWindow sortWindow = new SortWindow();
           sortWindow.Owner = this;
           sortWindow.ShowDialog();
+          break;
+
+        case "Work2":
+          DichotomyWindow dichotomyWindow = new DichotomyWindow();
+          dichotomyWindow.Owner = this;
+          dichotomyWindow.ShowDialog();
           break;
       }
     }

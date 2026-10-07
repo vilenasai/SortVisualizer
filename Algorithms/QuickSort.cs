@@ -7,7 +7,7 @@ namespace SortVisualizer.Algorithms {
   public class QuickSort : ISorter {
     public string Name => "Быстрая (Хоара) ⚡";
 
-    private double iterations;
+    private double passes;
     private bool isAscending;
     private Action<double[], int, int, double> onStep = null!;
     private int delayMs;
@@ -19,9 +19,10 @@ namespace SortVisualizer.Algorithms {
         Action<double[], int, int, double> onStep,
         int delayMs,
         CancellationToken ct) {
+
       double[] array = (double[])input.Clone();
 
-      this.iterations = 0;
+      this.passes = 0;
       this.isAscending = direction == SortDirection.Ascending;
       this.onStep = onStep;
       this.delayMs = delayMs;
@@ -33,11 +34,19 @@ namespace SortVisualizer.Algorithms {
     }
 
     private async Task QuickSortRecursive(double[] array, int lowIndex, int highIndex) {
-      if (lowIndex < highIndex) {
-        int pivotIndex = await Partition(array, lowIndex, highIndex);
-        await QuickSortRecursive(array, lowIndex, pivotIndex - 1);
-        await QuickSortRecursive(array, pivotIndex + 1, highIndex);
-      }
+      if (lowIndex >= highIndex) return;        // база — не считаем
+
+      ct.ThrowIfCancellationRequested();
+
+      passes += 1;                              // ← один рекурсивный вызов = один проход
+
+      if (onStep != null)
+        onStep((double[])array.Clone(), lowIndex, highIndex, passes);
+
+      int pivotIndex = await Partition(array, lowIndex, highIndex);
+
+      await QuickSortRecursive(array, lowIndex, pivotIndex - 1);
+      await QuickSortRecursive(array, pivotIndex + 1, highIndex);
     }
 
     private async Task<int> Partition(double[] array, int lowIndex, int highIndex) {
@@ -46,11 +55,6 @@ namespace SortVisualizer.Algorithms {
 
       for (int currentIndex = lowIndex; currentIndex < highIndex; currentIndex += 1) {
         ct.ThrowIfCancellationRequested();
-
-        iterations += 1;
-
-        if (onStep != null)
-          onStep((double[])array.Clone(), currentIndex, highIndex, iterations);
 
         bool needMove = isAscending
             ? array[currentIndex] <= pivotValue
@@ -63,6 +67,9 @@ namespace SortVisualizer.Algorithms {
           array[smallerIndex] = array[currentIndex];
           array[currentIndex] = temporary;
 
+          if (onStep != null)
+            onStep((double[])array.Clone(), smallerIndex, currentIndex, passes);
+
           if (delayMs > 0)
             await Task.Delay(delayMs, ct);
         }
@@ -73,6 +80,9 @@ namespace SortVisualizer.Algorithms {
       double pivotTemporary = array[smallerIndex];
       array[smallerIndex] = array[highIndex];
       array[highIndex] = pivotTemporary;
+
+      if (onStep != null)
+        onStep((double[])array.Clone(), smallerIndex, highIndex, passes);
 
       if (delayMs > 0)
         await Task.Delay(delayMs, ct);

@@ -30,12 +30,12 @@
                     Margin="8" FontSize="16" FontWeight="SemiBold"
                     Cursor="Hand"/>
 
-      <Button Content="2. Работа 2"
-                    Tag="" Click="OnTileClick"
-                    Background="#FFF8FA" Foreground="#7A5C68"
-                    BorderBrush="#F8BBD0" BorderThickness="2"
-                    Margin="8" FontSize="16"
-                    Cursor="Hand"/>
+      <Button Content="2. Дихотомия"
+        Tag="Work2" Click="OnTileClick"
+        Background="#F3E5F5" Foreground="#7A5C68"
+        BorderBrush="#CE93D8" BorderThickness="2"
+        Margin="8" FontSize="16"
+        Cursor="Hand"/>
 
       <Button Content="3. Работа 3"
                     Tag="" Click="OnTileClick"

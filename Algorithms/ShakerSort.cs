@@ -13,8 +13,9 @@ namespace SortVisualizer.Algorithms {
         Action<double[], int, int, double> onStep,
         int delayMs,
         CancellationToken ct) {
+
       double[] array = (double[])input.Clone();
-      double iterations = 0;
+      double passes = 0;                        // ← считаем проходы
       bool isAscending = direction == SortDirection.Ascending;
 
       int leftBound = 0;
@@ -22,9 +23,11 @@ namespace SortVisualizer.Algorithms {
       bool swapped = true;
 
       while (swapped) {
+        ct.ThrowIfCancellationRequested();
+
         swapped = false;
 
-        // Проход слева направо
+        // Проход вправо
         for (int currentIndex = leftBound; currentIndex < rightBound; currentIndex += 1) {
           ct.ThrowIfCancellationRequested();
 
@@ -41,16 +44,20 @@ namespace SortVisualizer.Algorithms {
             swapped = true;
 
             if (onStep != null)
-              onStep((double[])array.Clone(), currentIndex, currentIndex + 1, iterations);
+              onStep((double[])array.Clone(), currentIndex, currentIndex + 1, passes);
 
             if (delayMs > 0)
               await Task.Delay(delayMs, ct);
+          }
+          else {
+            if (onStep != null)
+              onStep((double[])array.Clone(), currentIndex, currentIndex + 1, passes);
           }
         }
 
         rightBound -= 1;
 
-        // Проход справа налево
+        // Проход влево
         for (int currentIndex = rightBound; currentIndex > leftBound; currentIndex -= 1) {
           ct.ThrowIfCancellationRequested();
 
@@ -67,22 +74,27 @@ namespace SortVisualizer.Algorithms {
             swapped = true;
 
             if (onStep != null)
-              onStep((double[])array.Clone(), currentIndex - 1, currentIndex, iterations);
+              onStep((double[])array.Clone(), currentIndex - 1, currentIndex, passes);
 
             if (delayMs > 0)
               await Task.Delay(delayMs, ct);
+          }
+          else {
+            if (onStep != null)
+              onStep((double[])array.Clone(), currentIndex - 1, currentIndex, passes);
           }
         }
 
         leftBound += 1;
 
-        // ⚡ Считаем итерацию, если были перестановки ИЛИ это первый проход
-        if (swapped || iterations == 0) {
-          iterations += 1;
+        // ← Один полный парный круг = один проход
+        passes += 1;
 
-          if (onStep != null)
-            onStep((double[])array.Clone(), -1, -1, iterations);
-        }
+        if (onStep != null)
+          onStep((double[])array.Clone(), -1, -1, passes);
+
+        if (!swapped)
+          break;
       }
 
       return array;

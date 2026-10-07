@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SortVisualizer.Views"
         mc:Ignorable="d"
-        Title="Метод дихотомии" Height="800" Width="1200"
+        Title="Метод дихотомии — поиск корня" Height="800" Width="1200"
         Background="#F3E5F5"
         FontFamily="Segoe UI" FontSize="13"
         WindowStartupLocation="CenterOwner">
@@ -17,7 +17,9 @@
         <MenuItem Header="Выход" Click="OnExitClick"/>
       </MenuItem>
       <MenuItem Header="Расчёт" Foreground="#4A148C">
-        <MenuItem Header="Рассчитать" Click="OnCalculateClick"/>
+        <MenuItem Header="Рассчитать корень" Click="OnCalculateRootClick"/>
+        <MenuItem Header="Построить график" Click="OnDrawGraphClick"/>
+        <Separator/>
         <MenuItem Header="Очистить" Click="OnClearClick"/>
       </MenuItem>
     </Menu>
@@ -60,7 +62,7 @@
                                VerticalAlignment="Center"
                                Foreground="#4A148C" Margin="0,0,6,0"/>
           <TextBox Grid.Row="0" Grid.Column="4"
-                             x:Name="TxtB" Text="5"
+                             x:Name="TxtB" Text="2"
                              Padding="4" Margin="0,0,0,6"
                              PreviewTextInput="NumericOnly_PreviewTextInput"/>
 
@@ -76,7 +78,7 @@
                                VerticalAlignment="Center"
                                Foreground="#4A148C" Margin="0,0,6,0"/>
           <TextBox Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2"
-                             x:Name="TxtFunction" Text="x*x - 4*x + 3"
+                             x:Name="TxtFunction" Text="x*x - 4"
                              Padding="4" Margin="0,0,0,0"/>
         </Grid>
       </Border>
@@ -97,15 +99,15 @@
                     BorderBrush="#CE93D8" BorderThickness="1"
                     Padding="12">
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="x_min = "
+          <TextBlock Text="Корень x = "
                                FontWeight="SemiBold" Foreground="#7B1FA2"/>
-          <TextBlock x:Name="TxtXMin" Text="—"
+          <TextBlock x:Name="TxtRoot" Text="—"
                                Foreground="#7B1FA2" FontWeight="SemiBold"
                                Margin="0,0,30,0"/>
 
-          <TextBlock Text="f(x_min) = "
+          <TextBlock Text="f(x) = "
                                FontWeight="SemiBold" Foreground="#7B1FA2"/>
-          <TextBlock x:Name="TxtFMin" Text="—"
+          <TextBlock x:Name="TxtFValue" Text="—"
                                Foreground="#7B1FA2" FontWeight="SemiBold"
                                Margin="0,0,30,0"/>
 

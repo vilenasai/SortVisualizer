@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,6 +13,7 @@ using NCalc;
 namespace SortVisualizer.Views {
   public partial class DichotomyWindow : Window {
     private const int GraphPoints = 400;
+    private const int ScanPoints = 1000;
     private const double MinEps = 1e-10;
     private const double MaxIntervalSize = 1e9;
     private const double ZeroTolerance = 1e-12;
@@ -21,54 +24,6 @@ namespace SortVisualizer.Views {
       DataObject.AddPastingHandler(TxtA, OnNumericPaste);
       DataObject.AddPastingHandler(TxtB, OnNumericPaste);
       DataObject.AddPastingHandler(TxtE, OnNumericPaste);
-
-      // ⚡ ВРЕМЕННЫЙ ТЕСТ NCalc — убрать после проверки
-      TestNCalc();
-    }
-
-    // ===== ТЕСТ NCalc =====
-
-    private void TestNCalc() {
-      string report = "=== Тест NCalc ===\n\n";
-
-      try {
-        NCalc.Expression expr1 = new NCalc.Expression("x*x - 4");
-        expr1.Parameters["x"] = 2.0;
-        object? r1 = expr1.Evaluate();
-        report += "1) x*x - 4 при x=2:\n   " + r1 + "  (ожидалось 0)\n\n";
-
-        NCalc.Expression expr2 = new NCalc.Expression("x*x - 4");
-        expr2.Parameters["x"] = 1.0;
-        object? r2 = expr2.Evaluate();
-        report += "2) x*x - 4 при x=1:\n   " + r2 + "  (ожидалось -3)\n\n";
-
-        NCalc.Expression expr3 = new NCalc.Expression("x*x - 4");
-        expr3.Parameters["x"] = 3.0;
-        object? r3 = expr3.Evaluate();
-        report += "3) x*x - 4 при x=3:\n   " + r3 + "  (ожидалось 5)\n\n";
-
-        NCalc.Expression expr4 = new NCalc.Expression("Sin(x)");
-        expr4.Parameters["x"] = 1.5708;
-        object? r4 = expr4.Evaluate();
-        report += "4) Sin(x) при x=1.5708:\n   " + r4 + "  (ожидалось ~1)\n\n";
-
-        NCalc.Expression expr5 = new NCalc.Expression("Cos(x)");
-        expr5.Parameters["x"] = 0.0;
-        object? r5 = expr5.Evaluate();
-        report += "5) Cos(x) при x=0:\n   " + r5 + "  (ожидалось 1)\n\n";
-
-        NCalc.Expression expr6 = new NCalc.Expression("Sqrt(x)");
-        expr6.Parameters["x"] = 16.0;
-        object? r6 = expr6.Evaluate();
-        report += "6) Sqrt(x) при x=16:\n   " + r6 + "  (ожидалось 4)\n\n";
-      }
-      catch (Exception ex) {
-        report += "\n!!! ОШИБКА: " + ex.Message + "\n" +
-                  "Тип: " + ex.GetType().Name + "\n";
-      }
-
-      MessageBox.Show(report, "Тест NCalc",
-          MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     // ===== ФИЛЬТР ВВОДА =====
@@ -106,7 +61,7 @@ namespace SortVisualizer.Views {
       return 0;
     }
 
-    // ===== РАСЧЁТ КОРНЯ =====
+    // ===== РАСЧЁТ ВСЕХ КОРНЕЙ =====
 
     private void OnCalculateRootClick(object sender, RoutedEventArgs e) {
       if (!TryGetParameters(out double a, out double b, out double eps, out Func<double, double>? f))
@@ -140,72 +95,117 @@ namespace SortVisualizer.Views {
         return;
       }
 
-      if (Math.Abs(fa) < ZeroTolerance) {
-        CultureInfo ruC = CultureInfo.GetCultureInfo("ru-RU");
-        TxtRoot.Text = a.ToString("F6", ruC);
-        TxtFValue.Text = fa.ToString("F6", ruC);
-        TxtIterations.Text = "0";
+      List<double> roots = FindAllRoots(a, b, eps, f);
 
+      if (roots.Count == 0) {
         MessageBox.Show(
-            "f(a) = 0 — корень на левой границе.\nx = " + a.ToString("F6"),
-            "Корень на границе", MessageBoxButton.OK, MessageBoxImage.Information);
-        return;
-      }
-
-      if (Math.Abs(fb) < ZeroTolerance) {
-        CultureInfo ruC = CultureInfo.GetCultureInfo("ru-RU");
-        TxtRoot.Text = b.ToString("F6", ruC);
-        TxtFValue.Text = fb.ToString("F6", ruC);
-        TxtIterations.Text = "0";
-
-        MessageBox.Show(
-            "f(b) = 0 — корень на правой границе.\nx = " + b.ToString("F6"),
-            "Корень на границе", MessageBoxButton.OK, MessageBoxImage.Information);
-        return;
-      }
-
-      int signChanges = CountSignChanges(a, b, f);
-
-      if (signChanges == 0) {
-        MessageBox.Show(
-            "На интервале [a, b] функция НЕ меняет знак.\nКорень не найден.\n\n" +
+            "На интервале [a, b] корней не найдено.\n" +
+            "Функция не меняет знак.\n\n" +
             "f(" + a + ") = " + fa.ToString("F6") + "\n" +
             "f(" + b + ") = " + fb.ToString("F6"),
             "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
         return;
       }
 
-      if (signChanges > 1) {
-        MessageBox.Show(
-            "На интервале [a, b] найдено " + signChanges + " смен знака.\n" +
-            "Метод дихотомии находит только ОДИН корень.\n" +
-            "Сузьте интервал [a, b], чтобы был только один корень.",
-            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        return;
-      }
-
-      int iterations;
-      double root;
-
-      try {
-        root = FindRoot(a, b, eps, f, out iterations);
-      }
-      catch (Exception ex) {
-        MessageBox.Show("Ошибка во время расчёта: " + ex.Message,
-            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        return;
-      }
-
-      double fRoot = f(root);
-
       CultureInfo ruCulture = CultureInfo.GetCultureInfo("ru-RU");
 
-      TxtRoot.Text = root.ToString("F6", ruCulture);
-      TxtFValue.Text = fRoot.ToString("F6", ruCulture);
-      TxtIterations.Text = iterations.ToString();
+      // Формируем список с ПЕРЕНОСОМ СТРОК
+      StringBuilder sb = new StringBuilder();
+      sb.Append("[");
+
+      const int perLine = 5;
+
+      for (int i = 0; i < roots.Count; i += 1) {
+        sb.Append(roots[i].ToString("F6", ruCulture));
+
+        if (i < roots.Count - 1) {
+          sb.Append(", ");
+
+          if ((i + 1) % perLine == 0) {
+            sb.Append("\n ");
+          }
+        }
+      }
+
+      sb.Append("]");
+
+      TxtRoot.Text = sb.ToString();
+      TxtFValue.Text = roots.Count.ToString() + " шт.";
+      TxtIterations.Text = "";
+
+      DrawGraph(a, b, f, roots);
     }
 
-    // ===== МЕТОД ДИХОТОМИИ ДЛЯ КОРНЯ =====
+    // ===== ПОИСК ВСЕХ КОРНЕЙ =====
+
+    private List<double> FindAllRoots(double a, double b, double eps,
+        Func<double, double> f) {
+      List<double> roots = new List<double>();
+
+      double step = (b - a) / ScanPoints;
+
+      double prevX = a;
+      double prevF = f(a);
+
+      for (int i = 1; i <= ScanPoints; i += 1) {
+        double x = a + i * step;
+        double fx;
+
+        try {
+          fx = f(x);
+        }
+        catch {
+          continue;
+        }
+
+        if (!double.IsFinite(fx)) {
+          prevX = x;
+          prevF = double.NaN;
+          continue;
+        }
+
+        int signPrev = SignOf(prevF);
+        int signCurr = SignOf(fx);
+
+        if (signCurr == 0) {
+          roots.Add(x);
+        }
+        else if (signPrev != 0 && signPrev != signCurr) {
+          try {
+            int iter;
+            double root = FindRoot(prevX, x, eps, f, out iter);
+            roots.Add(root);
+          }
+          catch {
+            // пропускаем
+          }
+        }
+
+        prevX = x;
+        prevF = fx;
+      }
+
+      List<double> unique = new List<double>();
+
+      foreach (double r in roots) {
+        bool isDuplicate = false;
+
+        foreach (double u in unique) {
+          if (Math.Abs(r - u) < eps * 10) {
+            isDuplicate = true;
+            break;
+          }
+        }
+
+        if (!isDuplicate)
+          unique.Add(r);
+      }
+
+      unique.Sort();
+      return unique;
+    }
+
+    // ===== МЕТОД ДИХОТОМИИ ДЛЯ ОДНОГО КОРНЯ =====
 
     private double FindRoot(double a, double b, double eps,
         Func<double, double> f, out int iterations) {
@@ -217,7 +217,7 @@ namespace SortVisualizer.Views {
 
       if (signA == signB) {
         throw new InvalidOperationException(
-            "Функция не меняет знак на [a, b] — корень не найден.");
+            "Функция не меняет знак — корень не найден.");
       }
 
       iterations = 0;
@@ -255,44 +255,6 @@ namespace SortVisualizer.Views {
       return (a + b) / 2;
     }
 
-    // ===== ПОДСЧЁТ СМЕН ЗНАКА =====
-
-    private int CountSignChanges(double a, double b, Func<double, double> f) {
-      const int checks = 200;
-      double step = (b - a) / checks;
-
-      int prevSign = SignOf(f(a));
-      int changes = 0;
-
-      for (int i = 1; i <= checks; i++) {
-        double x = a + i * step;
-        double value;
-
-        try {
-          value = f(x);
-        }
-        catch {
-          continue;
-        }
-
-        if (!double.IsFinite(value)) continue;
-
-        int currentSign = SignOf(value);
-
-        if (currentSign == 0) {
-          continue;
-        }
-
-        if (prevSign != 0 && currentSign != prevSign) {
-          changes += 1;
-        }
-
-        prevSign = currentSign;
-      }
-
-      return changes;
-    }
-
     // ===== ПОСТРОЕНИЕ ГРАФИКА =====
 
     private void OnDrawGraphClick(object sender, RoutedEventArgs e) {
@@ -301,24 +263,6 @@ namespace SortVisualizer.Views {
 
       if (f == null) return;
 
-      double fa, fb;
-      try {
-        fa = f(a);
-        fb = f(b);
-      }
-      catch (Exception ex) {
-        MessageBox.Show("Ошибка вычисления f(x): " + ex.Message,
-            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        return;
-      }
-
-      if (!double.IsFinite(fa) || !double.IsFinite(fb)) {
-        MessageBox.Show(
-            "Функция не определена на границах интервала [a, b].",
-            "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-        return;
-      }
-
       if (!IsContinuous(a, b, f)) {
         MessageBox.Show(
             "Функция имеет разрыв на интервале [a, b].",
@@ -326,18 +270,8 @@ namespace SortVisualizer.Views {
         return;
       }
 
-      double root = double.NaN;
-      double fRoot = double.NaN;
-
-      if (double.TryParse(TxtRoot.Text.Replace('.', ','),
-              NumberStyles.Any,
-              CultureInfo.GetCultureInfo("ru-RU"),
-              out double parsedRoot)) {
-        root = parsedRoot;
-        fRoot = f(root);
-      }
-
-      DrawGraph(a, b, f, root, fRoot);
+      List<double> roots = FindAllRoots(a, b, eps, f);
+      DrawGraph(a, b, f, roots);
     }
 
     // ===== ПРОВЕРКА НЕПРЕРЫВНОСТИ =====
@@ -356,7 +290,7 @@ namespace SortVisualizer.Views {
 
       if (!double.IsFinite(prevValue)) return false;
 
-      for (int i = 1; i <= checks; i++) {
+      for (int i = 1; i <= checks; i += 1) {
         double x = a + i * step;
         double value;
 
@@ -378,7 +312,7 @@ namespace SortVisualizer.Views {
       return true;
     }
 
-    // ===== ОБЩИЙ ПАРСИНГ ПАРАМЕТРОВ =====
+    // ===== ПАРСИНГ ПАРАМЕТРОВ =====
 
     private bool TryGetParameters(out double a, out double b, out double eps,
         out Func<double, double>? f) {
@@ -465,7 +399,7 @@ namespace SortVisualizer.Views {
       return true;
     }
 
-    // ===== ПАРСЕР ФОРМУЛЫ (через NCalc) =====
+    // ===== ПАРСЕР ФОРМУЛЫ (NCalc) =====
 
     private bool TryParseFunction(string formula, out Func<double, double>? f) {
       f = null;
@@ -498,11 +432,9 @@ namespace SortVisualizer.Views {
       }
 
       f = (x) => EvaluateNCalc(trimmed, x);
-
       return true;
     }
 
-    // ⚡ Вычисление через NCalc
     private double EvaluateNCalc(string formula, double x) {
       NCalc.Expression expr = new NCalc.Expression(formula);
       expr.Parameters["x"] = x;
@@ -515,20 +447,16 @@ namespace SortVisualizer.Views {
       return Convert.ToDouble(result, CultureInfo.InvariantCulture);
     }
 
-    // ⚡ Нормализация: тире, русская х, функции
     private string NormalizeFormula(string formula) {
       string result = formula;
 
-      // Тире → минус
       result = result.Replace("−", "-");
       result = result.Replace("–", "-");
       result = result.Replace("—", "-");
 
-      // Русская х → латинская x
       result = result.Replace("х", "x");
       result = result.Replace("Х", "x");
 
-      // Функции: sin → Sin, cos → Cos, ...
       result = result.Replace("asin", "Asin");
       result = result.Replace("acos", "Acos");
       result = result.Replace("atan", "Atan");
@@ -550,10 +478,10 @@ namespace SortVisualizer.Views {
       return result;
     }
 
-    // ===== ОТРИСОВКА ГРАФИКА =====
+    // ===== ОТРИСОВКА ГРАФИКА (координатные оси) =====
 
     private void DrawGraph(double a, double b, Func<double, double> f,
-        double root, double fRoot) {
+        List<double> roots) {
       GraphCanvas.Children.Clear();
 
       double width = GraphCanvas.ActualWidth;
@@ -579,15 +507,11 @@ namespace SortVisualizer.Views {
       double yMin = double.MaxValue;
       double yMax = double.MinValue;
 
-      for (int i = 0; i < points; i++) {
+      for (int i = 0; i < points; i += 1) {
         xs[i] = a + i * step;
 
-        try {
-          ys[i] = f(xs[i]);
-        }
-        catch {
-          ys[i] = double.NaN;
-        }
+        try { ys[i] = f(xs[i]); }
+        catch { ys[i] = double.NaN; }
 
         if (!double.IsFinite(ys[i])) {
           MessageBox.Show(
@@ -600,73 +524,146 @@ namespace SortVisualizer.Views {
         if (ys[i] > yMax) yMax = ys[i];
       }
 
-      if (Math.Abs(yMax - yMin) < 1e-9) {
+      if (Math.Abs(yMax - yMin) < 1e-9)
         yMax = yMin + 1;
-      }
+
+      double yPadding = (yMax - yMin) * 0.1;
+      double displayYMin = yMin - yPadding;
+      double displayYMax = yMax + yPadding;
+
+      if (yMin > 0) displayYMin = 0;
+      if (yMax < 0) displayYMax = 0;
 
       Func<double, double> toPixelX = (x) =>
           padding + (x - a) / (b - a) * plotWidth;
 
       Func<double, double> toPixelY = (y) =>
-          padding + (yMax - y) / (yMax - yMin) * plotHeight;
+          padding + (displayYMax - y) / (displayYMax - displayYMin) * plotHeight;
 
-      Line xAxis = new Line {
-        X1 = padding,
-        Y1 = height - padding,
-        X2 = width - padding,
-        Y2 = height - padding,
-        Stroke = Brushes.Gray,
-        StrokeThickness = 1
-      };
-      GraphCanvas.Children.Add(xAxis);
+      double zeroPixelY = toPixelY(0);
+      double zeroPixelX = toPixelX(0);
 
-      Line yAxis = new Line {
-        X1 = padding,
-        Y1 = padding,
-        X2 = padding,
-        Y2 = height - padding,
-        Stroke = Brushes.Gray,
-        StrokeThickness = 1
-      };
-      GraphCanvas.Children.Add(yAxis);
+      bool hasZeroY = (displayYMin <= 0 && displayYMax >= 0);
+      bool hasZeroX = (a <= 0 && b >= 0);
 
-      if (yMin <= 0 && yMax >= 0) {
-        Line zeroLine = new Line {
+      // ОСЬ X
+      if (hasZeroY) {
+        Line xAxis = new Line {
           X1 = padding,
-          Y1 = toPixelY(0),
+          Y1 = zeroPixelY,
           X2 = width - padding,
-          Y2 = toPixelY(0),
-          Stroke = Brushes.LightGray,
-          StrokeThickness = 1,
-          StrokeDashArray = new DoubleCollection { 4, 4 }
+          Y2 = zeroPixelY,
+          Stroke = Brushes.Black,
+          StrokeThickness = 1.5
         };
-        GraphCanvas.Children.Add(zeroLine);
+        GraphCanvas.Children.Add(xAxis);
+
+        Polygon arrowRight = new Polygon {
+          Points = new PointCollection
+            {
+                        new Point(width - padding + 2, zeroPixelY),
+                        new Point(width - padding - 8, zeroPixelY - 5),
+                        new Point(width - padding - 8, zeroPixelY + 5)
+                    },
+          Fill = Brushes.Black
+        };
+        GraphCanvas.Children.Add(arrowRight);
+
+        AddText(GraphCanvas, "x",
+            width - padding + 5, zeroPixelY - 18,
+            Brushes.Black);
+      }
+      else {
+        Line xAxis = new Line {
+          X1 = padding,
+          Y1 = height - padding,
+          X2 = width - padding,
+          Y2 = height - padding,
+          Stroke = Brushes.Gray,
+          StrokeThickness = 1
+        };
+        GraphCanvas.Children.Add(xAxis);
       }
 
-      AddText(GraphCanvas, $"a = {a:F3}", padding - 10, height - padding + 5,
-          Brushes.DarkSlateGray);
-      AddText(GraphCanvas, $"b = {b:F3}", width - padding - 40, height - padding + 5,
-          Brushes.DarkSlateGray);
-      AddText(GraphCanvas, $"{yMax:F2}", 5, padding,
-          Brushes.DarkSlateGray);
-      AddText(GraphCanvas, $"{yMin:F2}", 5, height - padding - 15,
-          Brushes.DarkSlateGray);
+      // ОСЬ Y
+      if (hasZeroX) {
+        Line yAxis = new Line {
+          X1 = zeroPixelX,
+          Y1 = padding,
+          X2 = zeroPixelX,
+          Y2 = height - padding,
+          Stroke = Brushes.Black,
+          StrokeThickness = 1.5
+        };
+        GraphCanvas.Children.Add(yAxis);
 
+        Polygon arrowUp = new Polygon {
+          Points = new PointCollection
+            {
+                        new Point(zeroPixelX, padding - 2),
+                        new Point(zeroPixelX - 5, padding + 8),
+                        new Point(zeroPixelX + 5, padding + 8)
+                    },
+          Fill = Brushes.Black
+        };
+        GraphCanvas.Children.Add(arrowUp);
+
+        AddText(GraphCanvas, "y",
+            zeroPixelX + 8, padding - 5,
+            Brushes.Black);
+      }
+      else {
+        Line yAxis = new Line {
+          X1 = padding,
+          Y1 = padding,
+          X2 = padding,
+          Y2 = height - padding,
+          Stroke = Brushes.Gray,
+          StrokeThickness = 1
+        };
+        GraphCanvas.Children.Add(yAxis);
+      }
+
+      if (hasZeroX && hasZeroY) {
+        AddText(GraphCanvas, "0",
+            zeroPixelX - 14, zeroPixelY + 4,
+            Brushes.Black);
+      }
+
+      AddText(GraphCanvas, $"{a:F2}",
+          padding - 15, height - padding + 5,
+          Brushes.DarkSlateGray);
+      AddText(GraphCanvas, $"{b:F2}",
+          width - padding - 30, height - padding + 5,
+          Brushes.DarkSlateGray);
+      AddText(GraphCanvas, $"{displayYMax:F2}",
+          5, padding, Brushes.DarkSlateGray);
+      AddText(GraphCanvas, $"{displayYMin:F2}",
+          5, height - padding - 15, Brushes.DarkSlateGray);
+
+      if (hasZeroY) {
+        DrawXAxisTicks(a, b, toPixelX, zeroPixelY, height);
+      }
+
+      // КРИВАЯ
       Polyline polyline = new Polyline {
         Stroke = new SolidColorBrush(Color.FromRgb(123, 31, 162)),
         StrokeThickness = 2
       };
 
-      for (int i = 0; i < points; i++) {
+      for (int i = 0; i < points; i += 1) {
         polyline.Points.Add(new Point(
             toPixelX(xs[i]),
             toPixelY(ys[i])));
       }
       GraphCanvas.Children.Add(polyline);
 
-      if (double.IsFinite(root) && double.IsFinite(fRoot)) {
+      // КОРНИ — всегда на оси y = 0
+      for (int index = roots.Count - 1; index >= 0; index -= 1) {
+        double root = roots[index];
+
         double px = toPixelX(root);
-        double py = toPixelY(fRoot);
+        double py = zeroPixelY;  // ← ВСЕГДА на нулевой линии
 
         Ellipse rootPoint = new Ellipse {
           Width = 14,
@@ -678,10 +675,50 @@ namespace SortVisualizer.Views {
         Canvas.SetLeft(rootPoint, px - 7);
         Canvas.SetTop(rootPoint, py - 7);
         GraphCanvas.Children.Add(rootPoint);
+      }
+    }
 
-        AddText(GraphCanvas, $"({root:F4}; {fRoot:F4})",
-            px + 12, py - 20,
-            new SolidColorBrush(Color.FromRgb(123, 31, 162)));
+    private void DrawXAxisTicks(double a, double b,
+        Func<double, double> toPixelX,
+        double zeroPixelY,
+        double height) {
+      double range = b - a;
+      if (range <= 0) return;
+
+      double[] steps = { 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000 };
+      double step = steps[steps.Length - 1];
+
+      foreach (double s in steps) {
+        if (range / s <= 15) {
+          step = s;
+          break;
+        }
+      }
+
+      double startTick = Math.Ceiling(a / step) * step;
+
+      for (double x = startTick; x <= b; x += step) {
+        if (Math.Abs(x) < step / 100) continue;
+
+        double px = toPixelX(x);
+
+        Line tick = new Line {
+          X1 = px,
+          Y1 = zeroPixelY - 4,
+          X2 = px,
+          Y2 = zeroPixelY + 4,
+          Stroke = Brushes.Black,
+          StrokeThickness = 1
+        };
+        GraphCanvas.Children.Add(tick);
+
+        string label = x.ToString("0.##");
+        double labelX = px - 12;
+        double labelY = zeroPixelY + 6;
+
+        if (labelY > height - 5) labelY = height - 15;
+
+        AddText(GraphCanvas, label, labelX, labelY, Brushes.Black);
       }
     }
 
@@ -699,14 +736,14 @@ namespace SortVisualizer.Views {
     // ===== ОЧИСТКА =====
 
     private void OnClearClick(object sender, RoutedEventArgs e) {
-      TxtA.Text = "1";
+      TxtA.Text = "-3";
       TxtB.Text = "3";
       TxtE.Text = "0.001";
       TxtFunction.Text = "x*x-4";
 
       TxtRoot.Text = "—";
       TxtFValue.Text = "—";
-      TxtIterations.Text = "—";
+      TxtIterations.Text = "";
 
       GraphCanvas.Children.Clear();
     }

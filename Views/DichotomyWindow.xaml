@@ -54,7 +54,7 @@
                                VerticalAlignment="Center"
                                Foreground="#4A148C" Margin="0,0,6,0"/>
           <TextBox Grid.Row="0" Grid.Column="1"
-                             x:Name="TxtA" Text="0"
+                             x:Name="TxtA" Text="-3"
                              Padding="4" Margin="0,0,0,6"
                              PreviewTextInput="NumericOnly_PreviewTextInput"/>
 
@@ -62,7 +62,7 @@
                                VerticalAlignment="Center"
                                Foreground="#4A148C" Margin="0,0,6,0"/>
           <TextBox Grid.Row="0" Grid.Column="4"
-                             x:Name="TxtB" Text="2"
+                             x:Name="TxtB" Text="3"
                              Padding="4" Margin="0,0,0,6"
                              PreviewTextInput="NumericOnly_PreviewTextInput"/>
 
@@ -78,7 +78,7 @@
                                VerticalAlignment="Center"
                                Foreground="#4A148C" Margin="0,0,6,0"/>
           <TextBox Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2"
-                             x:Name="TxtFunction" Text="x*x - 4"
+                             x:Name="TxtFunction" Text="x*x-4"
                              Padding="4" Margin="0,0,0,0"/>
         </Grid>
       </Border>
@@ -97,25 +97,31 @@
       <Border Grid.Row="2"
                     Background="#FFFFFF" CornerRadius="8"
                     BorderBrush="#CE93D8" BorderThickness="1"
-                    Padding="12">
-        <StackPanel Orientation="Horizontal">
-          <TextBlock Text="Корень x = "
-                               FontWeight="SemiBold" Foreground="#7B1FA2"/>
-          <TextBlock x:Name="TxtRoot" Text="—"
-                               Foreground="#7B1FA2" FontWeight="SemiBold"
-                               Margin="0,0,30,0"/>
+                    Padding="12" MaxHeight="180">
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+          <StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="Корень x = "
+                                       FontWeight="SemiBold" Foreground="#7B1FA2"/>
+              <TextBlock x:Name="TxtFValue" Text="—"
+                                       Foreground="#7B1FA2" FontWeight="SemiBold"/>
+            </StackPanel>
 
-          <TextBlock Text="f(x) = "
-                               FontWeight="SemiBold" Foreground="#7B1FA2"/>
-          <TextBlock x:Name="TxtFValue" Text="—"
-                               Foreground="#7B1FA2" FontWeight="SemiBold"
-                               Margin="0,0,30,0"/>
+            <TextBlock x:Name="TxtRoot"
+                                   Text="—"
+                                   Foreground="#7B1FA2"
+                                   FontFamily="Consolas"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"
+                                   Margin="0,6,0,0"/>
 
-          <TextBlock Text="Итераций: "
-                               FontWeight="SemiBold" Foreground="#7B1FA2"/>
-          <TextBlock x:Name="TxtIterations" Text="—"
-                               Foreground="#7B1FA2" FontWeight="SemiBold"/>
-        </StackPanel>
+            <TextBlock x:Name="TxtIterations" Text=""
+                                   Foreground="#7B1FA2"
+                                   FontSize="11"
+                                   Margin="0,4,0,0"/>
+          </StackPanel>
+        </ScrollViewer>
       </Border>
     </Grid>
   </DockPanel>

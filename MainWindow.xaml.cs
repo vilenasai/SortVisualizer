@@ -31,6 +31,12 @@ namespace SortVisualizer {
           dichotomyWindow.Owner = this;
           dichotomyWindow.ShowDialog();
           break;
+
+        case "GoldenSection":
+          GoldenSectionWindow goldenWindow = new GoldenSectionWindow();
+          goldenWindow.Owner = this;
+          goldenWindow.ShowDialog();
+          break;
       }
     }
   }

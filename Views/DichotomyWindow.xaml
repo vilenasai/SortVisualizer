@@ -3,24 +3,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SortVisualizer.Views"
         mc:Ignorable="d"
-        Title="Метод дихотомии — поиск корня" Height="800" Width="1200"
+        Title="Метод дихотомии — поиск корня"
+        Height="800"
+        Width="1200"
+        MinHeight="600"
+        MinWidth="800"
         Background="#F3E5F5"
-        FontFamily="Segoe UI" FontSize="13"
+        FontFamily="Segoe UI"
+        FontSize="13"
         WindowStartupLocation="CenterOwner">
 
   <DockPanel>
-    <!-- МЕНЮ СВЕРХУ -->
-    <Menu DockPanel.Dock="Top" Background="#E1BEE7">
-      <MenuItem Header="Файл" Foreground="#4A148C">
-        <MenuItem Header="Выход" Click="OnExitClick"/>
+    <Menu DockPanel.Dock="Top"
+              Background="#E1BEE7">
+
+      <MenuItem Header="Файл"
+                      Foreground="#4A148C">
+        <MenuItem Header="Выход"
+                          Click="OnExitClick"/>
       </MenuItem>
-      <MenuItem Header="Расчёт" Foreground="#4A148C">
-        <MenuItem Header="Рассчитать корень" Click="OnCalculateRootClick"/>
-        <MenuItem Header="Построить график" Click="OnDrawGraphClick"/>
+
+      <MenuItem Header="Расчёт"
+                      Foreground="#4A148C">
+        <MenuItem Header="Рассчитать корень"
+                          Click="OnCalculateRootClick"/>
+        <MenuItem Header="Построить график"
+                          Click="OnDrawGraphClick"/>
         <Separator/>
-        <MenuItem Header="Очистить" Click="OnClearClick"/>
+        <MenuItem Header="Очистить"
+                          Click="OnClearClick"/>
       </MenuItem>
     </Menu>
 
@@ -31,11 +43,15 @@
         <RowDefinition Height="Auto"/>
       </Grid.RowDefinitions>
 
-      <!-- ПАРАМЕТРЫ -->
+      <!-- Поля ввода -->
       <Border Grid.Row="0"
-                    Background="#FFFFFF" CornerRadius="8"
-                    BorderBrush="#CE93D8" BorderThickness="1"
-                    Padding="12" Margin="0,0,0,10">
+                    Background="White"
+                    CornerRadius="8"
+                    BorderBrush="#CE93D8"
+                    BorderThickness="1"
+                    Padding="12"
+                    Margin="0,0,0,10">
+
         <Grid>
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -43,85 +59,124 @@
             <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
           </Grid.ColumnDefinitions>
+
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
 
-          <TextBlock Grid.Row="0" Grid.Column="0" Text="a ="
+          <TextBlock Grid.Row="0"
+                               Grid.Column="0"
+                               Text="a ="
                                VerticalAlignment="Center"
-                               Foreground="#4A148C" Margin="0,0,6,0"/>
-          <TextBox Grid.Row="0" Grid.Column="1"
-                             x:Name="TxtA" Text="-3"
-                             Padding="4" Margin="0,0,0,6"
+                               Foreground="#4A148C"
+                               Margin="0,0,6,0"/>
+
+          <TextBox x:Name="TxtA"
+                             Grid.Row="0"
+                             Grid.Column="1"
+                             Text="0"
+                             Padding="4"
+                             Margin="0,0,0,6"
                              PreviewTextInput="NumericOnly_PreviewTextInput"/>
 
-          <TextBlock Grid.Row="0" Grid.Column="3" Text="b ="
+          <TextBlock Grid.Row="0"
+                               Grid.Column="3"
+                               Text="b ="
                                VerticalAlignment="Center"
-                               Foreground="#4A148C" Margin="0,0,6,0"/>
-          <TextBox Grid.Row="0" Grid.Column="4"
-                             x:Name="TxtB" Text="3"
-                             Padding="4" Margin="0,0,0,6"
+                               Foreground="#4A148C"
+                               Margin="0,0,6,0"/>
+
+          <TextBox x:Name="TxtB"
+                             Grid.Row="0"
+                             Grid.Column="4"
+                             Text="3"
+                             Padding="4"
+                             Margin="0,0,0,6"
                              PreviewTextInput="NumericOnly_PreviewTextInput"/>
 
-          <TextBlock Grid.Row="1" Grid.Column="0" Text="e ="
+          <TextBlock Grid.Row="0"
+                               Grid.Column="6"
+                               Text="ε ="
                                VerticalAlignment="Center"
-                               Foreground="#4A148C" Margin="0,0,6,0"/>
-          <TextBox Grid.Row="1" Grid.Column="1"
-                             x:Name="TxtE" Text="0.001"
-                             Padding="4" Margin="0,0,0,0"
+                               Foreground="#4A148C"
+                               Margin="0,0,6,0"/>
+
+          <TextBox x:Name="TxtE"
+                             Grid.Row="0"
+                             Grid.Column="7"
+                             Text="0.001"
+                             Padding="4"
+                             Margin="0,0,0,6"
                              PreviewTextInput="NumericOnly_PreviewTextInput"/>
 
-          <TextBlock Grid.Row="1" Grid.Column="3" Text="f(x) ="
+          <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Text="f(x) ="
                                VerticalAlignment="Center"
-                               Foreground="#4A148C" Margin="0,0,6,0"/>
-          <TextBox Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2"
-                             x:Name="TxtFunction" Text="x*x-4"
-                             Padding="4" Margin="0,0,0,0"/>
+                               Foreground="#4A148C"
+                               Margin="0,0,6,0"/>
+
+          <TextBox x:Name="TxtFunction"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             Grid.ColumnSpan="10"
+                             Text="x*x-4"
+                             Padding="4"/>
         </Grid>
       </Border>
 
-      <!-- ГРАФИК -->
+      <!-- График -->
       <Border Grid.Row="1"
-                    Background="#FFFFFF" CornerRadius="8"
-                    BorderBrush="#CE93D8" BorderThickness="1"
-                    Padding="10" Margin="0,0,0,10">
+                    Background="White"
+                    CornerRadius="8"
+                    BorderBrush="#CE93D8"
+                    BorderThickness="1"
+                    Padding="10"
+                    Margin="0,0,0,10">
+
         <Canvas x:Name="GraphCanvas"
-                        Background="#FFFFFF"
-                        ClipToBounds="True"/>
+                        Background="White"
+                        ClipToBounds="True"
+                        SizeChanged="GraphCanvas_SizeChanged"/>
       </Border>
 
-      <!-- РЕЗУЛЬТАТЫ -->
+      <!-- Результат -->
       <Border Grid.Row="2"
-                    Background="#FFFFFF" CornerRadius="8"
-                    BorderBrush="#CE93D8" BorderThickness="1"
-                    Padding="12" MaxHeight="180">
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
-          <StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="Корень x = "
-                                       FontWeight="SemiBold" Foreground="#7B1FA2"/>
-              <TextBlock x:Name="TxtFValue" Text="—"
-                                       Foreground="#7B1FA2" FontWeight="SemiBold"/>
-            </StackPanel>
+                    Background="White"
+                    CornerRadius="8"
+                    BorderBrush="#CE93D8"
+                    BorderThickness="1"
+                    Padding="12"
+                    MaxHeight="110">
+
+        <StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Корень x = "
+                                   FontWeight="SemiBold"
+                                   Foreground="#7B1FA2"/>
 
             <TextBlock x:Name="TxtRoot"
                                    Text="—"
                                    Foreground="#7B1FA2"
-                                   FontFamily="Consolas"
-                                   FontSize="12"
-                                   TextWrapping="Wrap"
-                                   Margin="0,6,0,0"/>
-
-            <TextBlock x:Name="TxtIterations" Text=""
-                                   Foreground="#7B1FA2"
-                                   FontSize="11"
-                                   Margin="0,4,0,0"/>
+                                   FontWeight="SemiBold"/>
           </StackPanel>
-        </ScrollViewer>
+
+          <TextBlock x:Name="TxtFValue"
+                               Text=""
+                               Foreground="#7B1FA2"
+                               FontFamily="Consolas"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               Margin="0,6,0,0"/>
+        </StackPanel>
       </Border>
     </Grid>
   </DockPanel>

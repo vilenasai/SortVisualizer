@@ -16,6 +16,7 @@
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
 
+    <!-- Заголовок возвращен к исходному цвету -->
     <TextBlock Grid.Row="0"
                    Text="Мои работы"
                    FontSize="26" FontWeight="SemiBold"
@@ -23,6 +24,7 @@
                    Margin="0,0,0,20"/>
 
     <UniformGrid Grid.Row="1" Rows="3" Columns="3">
+      <!-- 1. Сортировки (Исходный стиль) -->
       <Button Content="1. Сортировки"
                     Tag="Sort" Click="OnTileClick"
                     Background="#FCE4EC" Foreground="#C2185B"
@@ -30,6 +32,7 @@
                     Margin="8" FontSize="16" FontWeight="SemiBold"
                     Cursor="Hand"/>
 
+      <!-- 2. Дихотомия (Исходный стиль) -->
       <Button Content="2. Дихотомия"
         Tag="Work2" Click="OnTileClick"
         Background="#F3E5F5" Foreground="#7A5C68"
@@ -37,13 +40,24 @@
         Margin="8" FontSize="16"
         Cursor="Hand"/>
 
-      <Button Content="3. Работа 3"
-                    Tag="" Click="OnTileClick"
-                    Background="#FFF8FA" Foreground="#7A5C68"
-                    BorderBrush="#F8BBD0" BorderThickness="2"
-                    Margin="8" FontSize="16"
-                    Cursor="Hand"/>
+      <!-- 3. Золотое сечение (Новый мягкий персиковый стиль с тенью) -->
+      <Button Content="3. Золотое сечение"
+        Tag="GoldenSection"
+        Click="OnTileClick"
+        Background="#F5E6D3"
+        Foreground="#795548"
+        BorderBrush="#E8D1B5"
+        BorderThickness="1.5"
+        Margin="8"
+        FontSize="16"
+        FontWeight="SemiBold"
+        Cursor="Hand">
+        <Button.Effect>
+          <DropShadowEffect Color="#E8D1B5" BlurRadius="10" ShadowDepth="2" Opacity="0.4"/>
+        </Button.Effect>
+      </Button>
 
+      <!-- 4. Работа 4 (Исходный стиль) -->
       <Button Content="4. Работа 4"
                     Tag="" Click="OnTileClick"
                     Background="#FFF8FA" Foreground="#7A5C68"
@@ -51,6 +65,7 @@
                     Margin="8" FontSize="16"
                     Cursor="Hand"/>
 
+      <!-- 5. Работа 5 (Исходный стиль) -->
       <Button Content="5. Работа 5"
                     Tag="" Click="OnTileClick"
                     Background="#FFF8FA" Foreground="#7A5C68"
@@ -58,6 +73,7 @@
                     Margin="8" FontSize="16"
                     Cursor="Hand"/>
 
+      <!-- 6. Работа 6 (Исходный стиль) -->
       <Button Content="6. Работа 6"
                     Tag="" Click="OnTileClick"
                     Background="#FFF8FA" Foreground="#7A5C68"
@@ -65,6 +81,7 @@
                     Margin="8" FontSize="16"
                     Cursor="Hand"/>
 
+      <!-- 7. Работа 7 (Исходный стиль) -->
       <Button Content="7. Работа 7"
                     Tag="" Click="OnTileClick"
                     Background="#FFF8FA" Foreground="#7A5C68"
@@ -72,6 +89,7 @@
                     Margin="8" FontSize="16"
                     Cursor="Hand"/>
 
+      <!-- 8. Работа 8 (Исходный стиль) -->
       <Button Content="8. Работа 8"
                     Tag="" Click="OnTileClick"
                     Background="#FFF8FA" Foreground="#7A5C68"
@@ -79,6 +97,7 @@
                     Margin="8" FontSize="16"
                     Cursor="Hand"/>
 
+      <!-- 9. Работа 9 (Исходный стиль) -->
       <Button Content="9. Работа 9"
                     Tag="" Click="OnTileClick"
                     Background="#FFF8FA" Foreground="#7A5C68"
